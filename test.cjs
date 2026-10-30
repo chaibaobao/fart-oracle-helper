@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');const {validate,outcome}=require('./script.js');
+const fresh=()=>({v:1,n:8,p:2,round:1,log:[],lock:0,status:'active'});
+let s=fresh();s.log=['p','p'];assert.equal(outcome(s),'非屁者获胜');
+s=fresh();s.log=['n','n'];assert.equal(outcome(s),null);
+s=fresh();s.round=8;assert.equal(outcome(s),'非屁者获胜');s.p=4;assert.match(outcome(s),/人数相同/);s.p=5;assert.equal(outcome(s),'屁者获胜');
+s=fresh();assert.equal(outcome(s),null);s.round++;assert.equal(s.round,2);
+s=fresh();s.log.push('p','p');assert.equal(s.status,'active');assert.equal(s.round,1);assert.equal(outcome(s),'非屁者获胜');
+assert.deepEqual(validate(JSON.parse(JSON.stringify(s))),validate(s));
+s.log.push('p');assert.throws(()=>validate(s));s=fresh();s.log=Array(7).fill('n');assert.throws(()=>validate(s));
+s=fresh();s.log=Array(2).fill('p').concat(Array(6).fill('n'));assert.throws(()=>outcome(s),/双方均无/);
+s=fresh();s.log=['p'];s.log.pop();assert.deepEqual(validate(s),{a:2,b:6,d:0});
+console.log('PASS: A–E rule cases, serialization roundtrip, over-limit rejection, zero-survivor conflict, undo counts. Browser persistence/privacy still require browser testing.');
